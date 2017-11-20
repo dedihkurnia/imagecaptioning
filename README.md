@@ -13,3 +13,4 @@ cd image_captioning
 Baseline RNN implementation : https://github.com/mspandit/rnnlm
 Caffe : https://github.com/BVLC/caffe/
 Caffe : http://caffe.berkeleyvision.org/
+ImageNet : http://www.image-net.org
