@@ -104,15 +104,14 @@ class Caption_Generator():
 
             context_encode = tf.nn.tanh(context_encode)
 
-            context_encode_flat = tf.reshape(context_encode, [-1, self.dim_ctx]) # (batch_size*196, 512)
-            alpha = tf.matmul(context_encode_flat, self.att_W) + self.att_b # (batch_size*196, 1)
+            context_encode_flat = tf.reshape(context_encode, [-1, self.dim_ctx])
+            alpha = tf.matmul(context_encode_flat, self.att_W) + self.att_b
             alpha = tf.reshape(alpha, [-1, self.ctx_shape[0]])
             alpha = tf.nn.softmax( alpha )
 
             weighted_context = tf.reduce_sum(context * tf.expand_dims(alpha, 2), 1)
 
             lstm_preactive = tf.matmul(h, self.lstm_U) + x_t + tf.matmul(weighted_context, self.image_encode_W)
-            #i, f, o, new_c = tf.split(1, 4, lstm_preactive)    # CHANGED
             i, f, o, new_c = tf.split(lstm_preactive, 4, 1)
 
             i = tf.nn.sigmoid(i)
@@ -128,7 +127,6 @@ class Caption_Generator():
             logits = tf.nn.dropout(logits, 0.5)
 
             logit_words = tf.matmul(logits, self.decode_word_W) + self.decode_word_b
-            #cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logit_words, onehot_labels)    #   CHANGED
             cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits = logit_words, labels = onehot_labels)
             cross_entropy = cross_entropy * mask[:,ind]
 
@@ -190,7 +188,7 @@ class Caption_Generator():
         return context, generated_words, logit_list, alpha_list
 
 
-def preProBuildWordVocab(sentence_iterator, word_count_threshold=30): # borrowed this function from NeuralTalk
+def preProBuildWordVocab(sentence_iterator, word_count_threshold=30):
     print 'preprocessing word counts and creating vocab based on word count threshold %d' % (word_count_threshold, )
     word_counts = {}
     nsents = 0
@@ -202,9 +200,9 @@ def preProBuildWordVocab(sentence_iterator, word_count_threshold=30): # borrowed
     print 'filtered words from %d to %d' % (len(word_counts), len(vocab))
 
     ixtoword = {}
-    ixtoword[0] = '.'  # period at the end of the sentence. make first dimension be end token
+    ixtoword[0] = '.'
     wordtoix = {}
-    wordtoix['#START#'] = 0 # make first vector be the start token
+    wordtoix['#START#'] = 0
     ix = 1
     for w in vocab:
       wordtoix[w] = ix
@@ -213,13 +211,13 @@ def preProBuildWordVocab(sentence_iterator, word_count_threshold=30): # borrowed
 
     word_counts['.'] = nsents
     bias_init_vector = np.array([1.0*word_counts[ixtoword[i]] for i in ixtoword])
-    bias_init_vector /= np.sum(bias_init_vector) # normalize to frequencies
+    bias_init_vector /= np.sum(bias_init_vector)
     bias_init_vector = np.log(bias_init_vector)
-    bias_init_vector -= np.max(bias_init_vector) # shift to nice numeric range
+    bias_init_vector -= np.max(bias_init_vector)
     return wordtoix, ixtoword, bias_init_vector
 
 
-###### Parameters ######
+# Params for the NN
 n_epochs=1000
 batch_size=80
 dim_embed=256
@@ -227,12 +225,11 @@ dim_ctx=512
 dim_hidden=256
 ctx_shape=[196,512]
 pretrained_model_path = './model/model-8'
-#############################
-###### Parameters #####
+
+# file paths 
 annotation_path = './data/annotations.pickle'
 feat_path = './data/feats.npy'
 model_path = './model/'
-#############################
 
 
 def train(pretrained_model_path=pretrained_model_path):
@@ -330,9 +327,5 @@ def test(test_feat='./guitar_player.npy', model_path='./model/model-6', maxlen=2
     generated_words = generated_words[:punctuation]
     alpha_list_val = alpha_list_val[:punctuation]
     return generated_words, alpha_list_val
-
-#    generated_sentence = ' '.join(generated_words)
-#    ipdb.set_trace()
-
 
 train()
