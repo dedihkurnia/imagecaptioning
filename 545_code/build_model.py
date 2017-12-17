@@ -1,4 +1,11 @@
 #-*- coding: utf-8 -*-
+# This file is used to create GRU/LSTM and Attention Network
+# models on image features
+
+__author__ = "Pranav Ramarao, Sagnik Dam, Varsheeth Talluri"
+__license__ = "GPL"
+__version__ = "1.0.1"
+
 import math
 import os
 import ipdb

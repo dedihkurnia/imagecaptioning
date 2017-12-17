@@ -1,3 +1,9 @@
+# This file generates the image features
+
+__author__ = "Pranav Ramarao, Sagnik Dam, Varsheeth Talluri"
+__license__ = "GPL"
+__version__ = "1.0.1"
+
 import pandas as pd
 import numpy as np
 import os

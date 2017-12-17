@@ -1,3 +1,9 @@
+# This file is used to create a CNN model for the image features
+
+__author__ = "Pranav Ramarao, Sagnik Dam, Varsheeth Talluri"
+__license__ = "GPL"
+__version__ = "1.0.1"
+
 import caffe
 import ipdb
 import cv2
