@@ -1,6 +1,6 @@
-# Neural Caption Generator with Attention
-* Tensorflow implementation of "Show, attend and Tell" http://arxiv.org/abs/1502.03044
-* Borrowed most of the idea from the author's source code https://github.com/kelvinxu/arctic-captions
+# Caption Generation with Attention
+* Show, Attend and tell: http://arxiv.org/abs/1502.03044
+* Borrowed the idea from https://github.com/kelvinxu/arctic-captions
 
 ## Code
 * make_flickr_dataset.py: Extracts conv5_3 layer activations of VGG Network for flickr30k images, and save them in 'data/feats.npy'

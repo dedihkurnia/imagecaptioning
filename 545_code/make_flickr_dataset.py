@@ -27,4 +27,3 @@ annotations.to_pickle(annotation_result_path)
 if not os.path.exists(feat_path):
     feats = cnn.get_features(unique_images, layers='conv5_3', layer_sizes=[512,14,14])
     np.save(feat_path, feats)
-

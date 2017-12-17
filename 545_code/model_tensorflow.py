@@ -74,7 +74,6 @@ class Caption_Generator():
 
         h, c = self.get_initial_lstm(tf.reduce_mean(context, 1))
 
-        # TensorFlow가 dot(3D tensor, matrix) 계산을 못함;;; ㅅㅂ 삽질 ㄱㄱ
         context_flat = tf.reshape(context, [-1, self.dim_ctx])
         context_encode = tf.matmul(context_flat, self.image_att_W) # (batch_size, 196, 512)
         context_encode = tf.reshape(context_encode, [-1, ctx_shape[0], ctx_shape[1]])
@@ -105,7 +104,6 @@ class Caption_Generator():
 
             context_encode = tf.nn.tanh(context_encode)
 
-            # 여기도 context_encode: 3D -> flat required
             context_encode_flat = tf.reshape(context_encode, [-1, self.dim_ctx]) # (batch_size*196, 512)
             alpha = tf.matmul(context_encode_flat, self.att_W) + self.att_b # (batch_size*196, 1)
             alpha = tf.reshape(alpha, [-1, self.ctx_shape[0]])
@@ -221,7 +219,7 @@ def preProBuildWordVocab(sentence_iterator, word_count_threshold=30): # borrowed
     return wordtoix, ixtoword, bias_init_vector
 
 
-###### 학습 관련 Parameters ######
+###### Parameters ######
 n_epochs=1000
 batch_size=80
 dim_embed=256
@@ -230,14 +228,14 @@ dim_hidden=256
 ctx_shape=[196,512]
 pretrained_model_path = './model/model-8'
 #############################
-###### 잡다한 Parameters #####
+###### Parameters #####
 annotation_path = './data/annotations.pickle'
 feat_path = './data/feats.npy'
 model_path = './model/'
 #############################
 
 
-def train(pretrained_model_path=pretrained_model_path): # 전에 학습하던게 있으면 초기값 설정.
+def train(pretrained_model_path=pretrained_model_path):
     annotation_data = pd.read_pickle(annotation_path)
     captions = annotation_data['caption'].values
     wordtoix, ixtoword, bias_init_vector = preProBuildWordVocab(captions)
@@ -254,7 +252,7 @@ def train(pretrained_model_path=pretrained_model_path): # 전에 학습하던게
             dim_embed=dim_embed,
             dim_ctx=dim_ctx,
             dim_hidden=dim_hidden,
-            n_lstm_steps=maxlen+1, # w1~wN까지 예측한 뒤 마지막에 '.'예측해야하니까 +1
+            n_lstm_steps=maxlen+1,
             batch_size=batch_size,
             ctx_shape=ctx_shape,
             bias_init_vector=bias_init_vector)
@@ -284,7 +282,7 @@ def train(pretrained_model_path=pretrained_model_path): # 전에 학습하던게
             current_feats = current_feats.reshape(-1, ctx_shape[1], ctx_shape[0]).swapaxes(1,2)
 
             current_captions = captions[start:end]
-            current_caption_ind = map(lambda cap: [wordtoix[word] for word in cap.lower().split(' ')[:-1] if word in wordtoix], current_captions) # '.'은 제거
+            current_caption_ind = map(lambda cap: [wordtoix[word] for word in cap.lower().split(' ')[:-1] if word in wordtoix], current_captions)
 
             current_caption_matrix = sequence.pad_sequences(current_caption_ind, padding='post', maxlen=maxlen+1)
 
